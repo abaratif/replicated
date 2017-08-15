@@ -2,7 +2,7 @@
 
 ## Setup
 
-    This project requires python3 and uses virtualenv for development.
+    This project requires python2 and uses virtualenv for development.
 
 ### Running Locally
 ```
@@ -15,3 +15,11 @@
 ```
 
 After running, verify that the server is up by visiting ``` http://localhost:5000/api/v1.0/spec ```
+
+### Testing
+
+Use nose2 to execute unit tests.
+```
+	nose2 -v
+```
+

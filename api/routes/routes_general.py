@@ -169,7 +169,7 @@ route_path_general = Blueprint("route_path_general", __name__)
 #     return response_with(resp.SUCCESS_200, value={"author": author})
 
 
-@route_path_general.route('/v1.0/keys', methods=['GET'])
+@route_path_general.route('/v1.0/keys', methods=['GET', 'POST'])
 def fetch_keys():
     """
     Get github keys
