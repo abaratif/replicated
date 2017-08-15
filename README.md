@@ -8,7 +8,7 @@
 ```
     git clone https://github.com/abaratif/replicated.git
     cd replicated
-    virtualenv VENV
+    virtualenv -p python3 VENV
     source VENV/bin/activate
     pip install -r requirements.txt
     python -m run
