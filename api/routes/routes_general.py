@@ -17,18 +17,19 @@ def requests_helper(urls):
     """
     DEFAULT_ERROR = 'An unknown error has occured.'
 
-    results = {username: requests.get(url) for username, url in urls}
+    results = {username: requests.get(urls[username]) for username in urls.keys()}
 
     keys = {}
-    
-    for username, r in results:
-        
+
+    for username in results:
+        r = results[username]
+        data = json.loads(r.text)
         # Error handling
         if r.status_code != 200:
             error = data.get('message') if 'message' in data else DEFAULT_ERROR
-            raise Exception(error)        
-        
-        data = json.loads(r.text)
+            raise Exception(error)
+
+
         keys[username] = data
 
 
@@ -36,12 +37,12 @@ def requests_helper(urls):
 
 def error_hanlder_helper(error):
     error = str(error)
-
+    # print("Error handler got the error: {}".format(error))
     if 'Not Found' in error:
         return response_with(resp.INVALID_INPUT_422, value={
                 'error': error
             })
-    
+
     elif 'rate limit exceeded' in error:
         return response_with(resp.UNAUTHORIZED_403, value={
                 'error': error
@@ -63,7 +64,7 @@ def fetch_keys():
     parameters:
         - name: users
           in: body
-          description: JSON Blob with a "users" attribute, which contains a list of github usernames. 
+          description: JSON Blob with a "users" attribute, which contains a list of github usernames.
           required: true
           schema:
             type: string
@@ -80,7 +81,7 @@ def fetch_keys():
                                 id:
                                     type: string
                                 key:
-                                    type: string                                
+                                    type: string
 
     """
     GH_BASE_URL = 'https://api.github.com/'

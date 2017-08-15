@@ -89,8 +89,9 @@ class TestAPI(BaseTestCase):
             content_type='application/json'
             )
         self.assertEqual(200, response.status_code)
+
         json_response = json.loads(response.data)
-        self.assertTrue('data' in json_response)   
+        self.assertTrue('data' in json_response)
 
         data = json_response['data']
 
@@ -116,22 +117,22 @@ class TestAPI(BaseTestCase):
             )
         self.assertEqual(422, response.status_code)
 
-    # def test_keys_4(self):
-    #     """
-    #         Test getting keys with malformed input
-    #     """
-    #     users = {
-    #         'whosers': [
-    #             'guy1'
-    #         ]
-    #     }
+    def test_keys_4(self):
+        """
+            Test getting keys with malformed input
+        """
+        users = {
+            'whosers': [
+                'guy1'
+            ]
+        }
 
-    #     response = self.app.post(
-    #         '/api/v1.0/keys',
-    #         data=json.dumps(users),
-    #         content_type='application/json'
-    #         )
-    #     self.assertEqual(422, response.status_code)
+        response = self.app.post(
+            '/api/v1.0/keys',
+            data=json.dumps(users),
+            content_type='application/json'
+            )
+        self.assertEqual(422, response.status_code)
 
     # def test_keys_5(self):
         """
@@ -155,5 +156,3 @@ class TestAPI(BaseTestCase):
         #     data=json.dumps(users),
         #     content_type='application/json'
         #     )
-
-
