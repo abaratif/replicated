@@ -10,20 +10,29 @@ from api.models.model_author import Author, AuthorSchema
 
 route_path_general = Blueprint("route_path_general", __name__)
 
-def fetch_key_helper(url):
-
+def requests_helper(urls):
+    """
+        Takes in a dict of username : URL pairs, and makes requests for each URL
+        Returns a dict of username: request pairs after executing r
+    """
     DEFAULT_ERROR = 'An unknown error has occured.'
 
+    results = {username: requests.get(url) for username, url in urls}
+
+    keys = {}
     
-    r = requests.get(url)
-    data = json.loads(r.text)
+    for username, r in results:
+        
+        # Error handling
+        if r.status_code != 200:
+            error = data.get('message') if 'message' in data else DEFAULT_ERROR
+            raise Exception(error)        
+        
+        data = json.loads(r.text)
+        keys[username] = data
 
-    # Error handling
-    if r.status_code != 200:
-        error = data.get('message') if 'message' in data else DEFAULT_ERROR
-        raise Exception(error)
 
-    return data
+    return keys
 
 def error_hanlder_helper(error):
     error = str(error)
@@ -89,7 +98,7 @@ def fetch_keys():
     result = {}
 
     try:
-        result = {username: fetch_key_helper(url) for username, url in urls}
+        result = requests_helper(urls)
 
     except Exception as error:
         return error_hanlder_helper(error)
