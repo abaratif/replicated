@@ -193,7 +193,8 @@ def fetch_keys():
     result = {}
 
     GH_BASE_URL = 'https://api.github.com/'
-    USERNAMES = ['kennethreitz', 'gvanrossum', 'abaratif']
+    # USERNAMES = ['kennethreitz', 'gvanrossum', 'abaratif']
+    USERNAMES = []
 
     for username in USERNAMES:
 

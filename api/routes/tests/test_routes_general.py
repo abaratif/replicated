@@ -68,11 +68,34 @@ class TestAPI(BaseTestCase):
 
         self.assertTrue('abaratif' in data)
         self.assertTrue('gvanrossum' in data)
-        
+
         self.assertTrue(len(data['gvanrossum']) == 1)
         self.assertTrue(len(data['abaratif']) == 0)
         self.assertTrue(len(data['kennethreitz']) == 4)
 
+    def test_keys_2(self):
+        """
+            Test getting keys for a single user.
+        """
+        users = {
+            'users': [
+                'gvanrossum'
+            ]
+        }
+
+        response = self.app.post(
+            '/api/v1.0/keys',
+            data=json.dumps(users),
+            content_type='application/json'
+            )
+        self.assertEqual(200, response.status_code)
+        json_response = json.loads(response.data)
+        self.assertTrue('data' in json_response)   
+
+        data = json_response['data']
+
+        self.assertTrue('gvanrossum' in data)
+        self.assertTrue(len(data['gvanrossum']) == 1)
 
     # def test_create_author(self):
     #     author = {
