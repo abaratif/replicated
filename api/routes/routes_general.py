@@ -10,30 +10,34 @@ from api.models.model_author import Author, AuthorSchema
 
 route_path_general = Blueprint("route_path_general", __name__)
 
+
 def requests_helper(urls):
     """
-        Takes in a dict of username : URL pairs, and makes requests for each URL
-        Returns a dict of username: request pairs after executing r
+    Takes in a dict of username : URL pairs, and makes requests for each URL
+    Returns a dict of username: request pairs after executing r
     """
     DEFAULT_ERROR = 'An unknown error has occured.'
 
-    results = {username: requests.get(urls[username]) for username in urls.keys()}
+    # Execute all the requests
+    reqs = {urls[username] for username in urls.keys()}
+    reqs = {requests.get(req) for req in reqs}
 
-    keys = {}
+    # print reqs
+    # return None
+    response = {}
 
-    for username in results:
-        r = results[username]
-        data = json.loads(r.text)
+    for req in reqs:
+        username = req.url.split('/')[4]
+        data = json.loads(req.text)
+
         # Error handling
-        if r.status_code != 200:
+        if req.status_code != 200:
             error = data.get('message') if 'message' in data else DEFAULT_ERROR
             raise Exception(error)
 
+        response[username] = data
 
-        keys[username] = data
-
-
-    return keys
+    return response
 
 def error_hanlder_helper(error):
     error = str(error)

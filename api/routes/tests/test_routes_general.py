@@ -60,7 +60,6 @@ class TestAPI(BaseTestCase):
             )
         self.assertEqual(200, response.status_code)
 
-
         json_response = json.loads(response.data)
         self.assertTrue('data' in json_response)
 
