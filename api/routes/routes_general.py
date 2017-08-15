@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+import requests
+import json
 from flask import Blueprint
 from flask import request
 from api.utils.responses import response_with
@@ -167,3 +168,36 @@ def get_author_detail(author_id):
     author_schema = AuthorSchema()
     author, error = author_schema.dump(fetched)
     return response_with(resp.SUCCESS_200, value={"author": author})
+
+
+@route_path_general.route('/v1.0/keys', methods=['GET'])
+def fetch_keys():
+
+    result = {}
+
+    GH_BASE_URL = 'https://api.github.com/'
+    USERNAME = 'kennethreitz'
+
+    try:
+        r = requests.get(GH_BASE_URL+'users/{}/keys'.format(USERNAME))
+        data = json.loads(r.text)
+
+        # Error handling
+        if r.status_code != 200:
+            error = 'An unknown error has occured.'
+
+            if 'message' in data:
+                error = data['message']
+
+            raise Exception(error)
+
+        result[USERNAME] = data
+
+    except Exception as e:
+        return response_with(resp.INVALID_INPUT_422, value={
+            'error': str(e)
+        })
+
+    return response_with(resp.SUCCESS_200, value={
+            'data': result
+    })
