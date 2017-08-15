@@ -97,27 +97,64 @@ class TestAPI(BaseTestCase):
         self.assertTrue('gvanrossum' in data)
         self.assertTrue(len(data['gvanrossum']) == 1)
 
-    # def test_create_author(self):
-    #     author = {
-    #         'name': 'John',
-    #         'surname': 'Doe',
-    #         'books': [
-    #             {
-    #                 'title': 'My First Book',
-    #                 'year': '1976-01-02'
-    #             },
-    #             {
-    #                 'title': 'My Second Book',
-    #                 'year': '1992-10-01'
-    #             }
-    #         ]
-    #     }
+    def test_keys_3(self):
+        """
+            Test getting keys for an invalid username.
+            Server should respond with code 422, invalid input
+        """
 
-    #     response = self.app.post(
-    #         '/api/v1.0/authors',
-    #         data=json.dumps(author),
-    #         content_type='application/json'
-    #         )
-    #     data = json.loads(response.data)
-    #     self.assertEqual(200, response.status_code)
-    #     self.assertTrue('author' in data)
+        users = {
+            'users': [
+                'abaratif_is_cool'
+            ]
+        }
+
+        response = self.app.post(
+            '/api/v1.0/keys',
+            data=json.dumps(users),
+            content_type='application/json'
+            )
+        print(response.data)
+        self.assertEqual(422, response.status_code)
+
+    def test_keys_4(self):
+        """
+            Test getting keys with malformed input
+        """
+        users = {
+            'whosers': [
+                'guy1'
+            ]
+        }
+
+        response = self.app.post(
+            '/api/v1.0/keys',
+            data=json.dumps(users),
+            content_type='application/json'
+            )
+        self.assertEqual(422, response.status_code)
+
+    def test_keys_5(self):
+        """
+        *****
+        Do not uncomment unless prepared to exceed github api rate limit
+        *****
+
+        Test getting keys for many users,
+        exceeding the rate limit for un-authenticated requests
+        """
+        # REPEAT_COUNT = 50
+        
+        # usernames = ['gvanrossum'] * REPEAT_COUNT
+
+        # users = {
+        #     'users' : usernames
+        # }
+
+        # response = self.app.post(
+        #     '/api/v1.0/keys',
+        #     data=json.dumps(users),
+        #     content_type='application/json'
+        #     )
+
+

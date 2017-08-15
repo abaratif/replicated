@@ -42,16 +42,22 @@ def fetch_keys():
                                     type: string                                
 
     """
+    GH_BASE_URL = 'https://api.github.com/'
 
     # Read in input from POST
     data = request.get_json()
-    USERNAMES = data['users']
+
+    if 'users' not in data:
+        return response_with(resp.INVALID_INPUT_422, value={
+                'error': "JSON Input malformed"
+            })
+
+    usernames = data['users']
 
     result = {}
 
-    GH_BASE_URL = 'https://api.github.com/'
 
-    for username in USERNAMES:
+    for username in usernames:
 
         try:
             r = requests.get(GH_BASE_URL+'users/{}/keys'.format(username))
@@ -64,12 +70,23 @@ def fetch_keys():
                 if 'message' in data:
                     error = data['message']
 
-                raise Exception(error)
+                if error == 'Not Found':
+                    return response_with(resp.INVALID_INPUT_422, value={
+                            'error': error
+                        })
+                
+                elif 'rate limit exceeded' in error:
+                    return response_with(resp.INVALID_INPUT_403, value={
+                            'error': error
+                        })
+
+                else:
+                    raise Exception(error)
 
             result[username] = data
 
         except Exception as e:
-            return response_with(resp.INVALID_INPUT_422, value={
+            return response_with(resp.SERVER_ERROR_500, value={
                 'error': str(e)
             })
 
