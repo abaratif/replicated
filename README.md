@@ -23,10 +23,6 @@ Use nose2 to execute unit tests.
 	nose2 -v
 ```
 
-### API Spec
-
-This project uses flask-swagger to provide a clear API specification. The API spec lives at the ```/api/v1.0/spec``` endpoint. For easy viewing, install the Swagger UI Console extension for Chrome.
-
 ## Usage
 
 Once the API is spun up, POST requests can be sent to the ```/api/v1.0/keys``` endpoint. See the following curl command for an example.
@@ -103,6 +99,22 @@ curl -X POST --header 'Content-Type: application/json' --header 'Accept: applica
   "error": "Not Found", 
   "message": "Invalid input"
 }
+```
+
+## Deployment
+
+This API can be deployed using Docker.
+
+### Building the container
+
+```
+docker build -t flask-api-starter .
+```
+
+### Running the container
+
+```
+docker run -dt --restart=always --name=flask-api-starter -p 5000:5000 -e 'WORK_ENV=PROD' flask-api-starter
 ```
 
 

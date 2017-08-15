@@ -10,6 +10,38 @@ from api.models.model_author import Author, AuthorSchema
 
 route_path_general = Blueprint("route_path_general", __name__)
 
+def fetch_key_helper(url):
+
+    DEFAULT_ERROR = 'An unknown error has occured.'
+
+    
+    r = requests.get(url)
+    data = json.loads(r.text)
+
+    # Error handling
+    if r.status_code != 200:
+        error = data.get('message') if 'message' in data else DEFAULT_ERROR
+        raise Exception(error)
+
+    return data
+
+def error_hanlder_helper(error):
+    error = str(error)
+
+    if 'Not Found' in error:
+        return response_with(resp.INVALID_INPUT_422, value={
+                'error': error
+            })
+    
+    elif 'rate limit exceeded' in error:
+        return response_with(resp.UNAUTHORIZED_403, value={
+                'error': error
+            })
+
+    return response_with(resp.SERVER_ERROR_500, value={
+        'error': error
+    })
+
 @route_path_general.route('/v1.0/keys', methods=['POST'])
 def fetch_keys():
     """
@@ -52,43 +84,15 @@ def fetch_keys():
                 'error': "JSON Input malformed"
             })
 
-    usernames = data['users']
+    urls = {username: GH_BASE_URL+'users/{}/keys'.format(username) for username in data['users']}
 
     result = {}
 
+    try:
+        result = {username: fetch_key_helper(url) for username, url in urls}
 
-    for username in usernames:
-
-        try:
-            r = requests.get(GH_BASE_URL+'users/{}/keys'.format(username))
-            data = json.loads(r.text)
-
-            # Error handling
-            if r.status_code != 200:
-                error = 'An unknown error has occured.'
-
-                if 'message' in data:
-                    error = data['message']
-
-                if error == 'Not Found':
-                    return response_with(resp.INVALID_INPUT_422, value={
-                            'error': error
-                        })
-                
-                elif 'rate limit exceeded' in error:
-                    return response_with(resp.INVALID_INPUT_403, value={
-                            'error': error
-                        })
-
-                else:
-                    raise Exception(error)
-
-            result[username] = data
-
-        except Exception as e:
-            return response_with(resp.SERVER_ERROR_500, value={
-                'error': str(e)
-            })
+    except Exception as error:
+        return error_hanlder_helper(error)
 
     return response_with(resp.SUCCESS_200, value={
             'data': result
