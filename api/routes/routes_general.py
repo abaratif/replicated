@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import requests
+import grequests
 import json
 from flask import Blueprint
 from flask import request
@@ -19,8 +19,9 @@ def requests_helper(urls):
     DEFAULT_ERROR = 'An unknown error has occured.'
 
     # Execute all the requests
-    reqs = {urls[username] for username in urls.keys()}
-    reqs = {requests.get(req) for req in reqs}
+    urls = [urls[username] for username in urls.keys()]
+    reqs = [grequests.get(url) for url in urls]
+    reqs = grequests.map(reqs)
 
     # print reqs
     # return None
@@ -39,9 +40,15 @@ def requests_helper(urls):
 
     return response
 
+
 def error_hanlder_helper(error):
+    """
+    Helper function to handle errors when making requests
+    to github API
+    """
     error = str(error)
     # print("Error handler got the error: {}".format(error))
+
     if 'Not Found' in error:
         return response_with(resp.INVALID_INPUT_422, value={
                 'error': error
@@ -55,6 +62,7 @@ def error_hanlder_helper(error):
     return response_with(resp.SERVER_ERROR_500, value={
         'error': error
     })
+
 
 @route_path_general.route('/v1.0/keys', methods=['POST'])
 def fetch_keys():
